@@ -4,16 +4,7 @@
 #include "I2P2_def.h"
 
 namespace I2P2 {
-struct Node {
-  Node *prev, *next;
-  value_type *p_data;
-  ~Node() { if (p_data) delete p_data; }
-  Node() : prev(nullptr), next(nullptr), p_data(nullptr) {}
-  Node(value_type *pd) : prev(nullptr), next(nullptr), p_data(pd) {}
-};
-
 struct iterator_impl_base {
-  virtual iterator_impl_base *clone() = 0;
   virtual reference operator*() const = 0;
   virtual reference operator[](difference_type offset) const = 0;
   virtual pointer operator->() const = 0;
@@ -28,19 +19,17 @@ struct iterator_impl_base {
   virtual bool operator>(const iterator_impl_base &rhs) const = 0;
   virtual bool operator<=(const iterator_impl_base &rhs) const = 0;
   virtual bool operator>=(const iterator_impl_base &rhs) const = 0;
-
-  virtual value_type **get_pp_data() const;
-  virtual Node *get_p_node() const;
+  /* This is the base class of all the container-specialized iterators
+   * In order to invoke a derived function from this class
+   * you may have to either do a downcast or invoke from a virtual function */
 };
 
 class vector_iterator : public iterator_impl_base {
  protected:
-  value_type **pp_data;
+  // You may want to declare what your vector_iterator stores here
 
  public:
   vector_iterator();
-  vector_iterator(value_type **ppd);
-  iterator_impl_base *clone();
   iterator_impl_base &operator++();
   iterator_impl_base &operator--();
   iterator_impl_base &operator+=(difference_type offset);
@@ -55,18 +44,14 @@ class vector_iterator : public iterator_impl_base {
   pointer operator->() const;
   reference operator*() const;
   reference operator[](difference_type offset) const;
-
-  value_type **get_pp_data() const;
 };
 
 class list_iterator : public iterator_impl_base {
  protected:
-  Node *p_node;
+  // You may want to declare what your list_iterator stores here
 
  public:
   list_iterator();
-  list_iterator(Node *pnd);
-  iterator_impl_base *clone();
   iterator_impl_base &operator++();
   iterator_impl_base &operator--();
   iterator_impl_base &operator+=(difference_type offset);
@@ -81,8 +66,6 @@ class list_iterator : public iterator_impl_base {
   pointer operator->() const;
   reference operator*() const;
   reference operator[](difference_type offset) const;
-
-  Node *get_p_node() const;
 };
 
 class const_iterator {
@@ -120,8 +103,10 @@ class const_iterator {
   bool operator>(const const_iterator &rhs) const;
   bool operator<=(const const_iterator &rhs) const;
   bool operator>=(const const_iterator &rhs) const;
-  Node *get_p_node() const;
-  value_type **get_pp_data() const;
+  /* This class holds an iterator_impl_base
+   * and you may want to have some ways to 
+   * invoke a container-specialized method from here
+   * for insert/erase methods (look at their parameters if you are not sure) */
 };
 
 class iterator : public const_iterator {

@@ -1,7 +1,6 @@
 #include "../header/I2P2_iterator.h"
 
 namespace I2P2 {
-iterator_impl_base::~iterator_impl_base() {}
 value_type **iterator_impl_base::get_pp_data() const { return nullptr; }
 Node *iterator_impl_base::get_p_node() const { return nullptr; }
 vector_iterator::vector_iterator() : pp_data(nullptr) {}
